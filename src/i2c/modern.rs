@@ -1049,9 +1049,11 @@ fn init_master_bus<'d, I2C: I2c>(
     let config = i2c_master_bus_config_t {
         sda_io_num: sda.pin(),
         scl_io_num: scl.pin(),
-        clk_source: config.source_clock.into(),
+        __bindgen_anon_1: i2c_master_bus_config_t__bindgen_ty_1 {
+            clk_source: config.source_clock.into(),
+        },
         flags: {
-            let mut flags = i2c_master_bus_config_t__bindgen_ty_1::default();
+            let mut flags = i2c_master_bus_config_t__bindgen_ty_2::default();
             flags.set_enable_internal_pullup(config.pullup_enabled as _);
             flags
         },
@@ -1081,6 +1083,11 @@ fn init_device(
         device_address: config.address.address(),
         dev_addr_length: config.address.clone().into(),
         scl_speed_hz: config.baudrate.into(),
+        flags: {
+            let mut flags = i2c_device_config_t__bindgen_ty_1::default();
+            flags
+        },
+        scl_wait_us: 0,
     };
 
     let mut handle: i2c_master_dev_handle_t = ptr::null_mut();
@@ -1106,7 +1113,7 @@ fn init_slave_device<'d, I2C: I2c>(
         clk_source: config.source_clock.into(),
         flags: {
             let mut flags = i2c_slave_config_t__bindgen_ty_1::default();
-            flags.set_stretch_en(0);
+            // flags.set_stretch_en(0);
             flags.set_broadcast_en(config.broadcast_enable as _);
             flags
         },
@@ -1190,7 +1197,7 @@ fn enable_slave_isr_callback(handle: i2c_slave_dev_handle_t, host: u8) -> Result
             handle,
             &i2c_slave_event_callbacks_t {
                 on_recv_done: Some(slave_isr),
-                on_stretch_occur: None,
+                // on_stretch_occur: None,
             },
             &NOTIFIER[host as usize] as *const _ as *mut _,
         )
